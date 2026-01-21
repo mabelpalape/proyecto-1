@@ -113,19 +113,23 @@ else:
 
 st.sidebar.divider()
 if st.sidebar.button("⚡ Generate Mock Data (Reset DB)"):
-    with st.spinner("Generating 4 years of history..."):
-        # Import here to avoid circulars or early exec issues if needed
-        from app.core.db import create_db_and_tables
-        from app.services.mock_data import create_mock_data
-        from app.services.rfm import run_rfm_analysis
-        from app.services.recommendation import run_recommendation_engine
-        
-        create_db_and_tables()
-        create_mock_data()
-        run_rfm_analysis()
-        run_recommendation_engine()
-    st.success("Data generated! Refreshing...")
-    st.rerun()
+    try:
+        with st.spinner("Generating 4 years of history..."):
+            # Import here to avoid circulars or early exec issues if needed
+            from app.core.db import create_db_and_tables
+            from app.services.mock_data import create_mock_data
+            from app.services.rfm import run_rfm_analysis
+            from app.services.recommendation import run_recommendation_engine
+            
+            create_db_and_tables()
+            create_mock_data()
+            run_rfm_analysis()
+            run_recommendation_engine()
+        st.success("Data generated! Refreshing...")
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error generating data: {str(e)}")
+        st.error("Please check the logs for details or try again.")
 
 # --- Analytics / RFM Charts ---
 st.divider()
