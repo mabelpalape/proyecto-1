@@ -8,13 +8,16 @@ import os
 # Add backend to path so we can import app modules
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from app.core.db import engine
+from app.core.db import engine, create_db_and_tables
 from app.models.analysis import Recommendation, RFMProfile
 from app.models.customer import Customer
 from app.models.product import Product
 from app.models.order import Order # Fixes relationship resolution
 
 st.set_page_config(page_title="E-commerce Predictive Analytics", layout="wide")
+
+# Ensure tables exist (crucial for Streamlit Cloud where DB is ephemeral)
+create_db_and_tables()
 
 st.title("📊 Predictive Analytics & Recommendations")
 
