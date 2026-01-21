@@ -22,30 +22,39 @@ create_db_and_tables()
 st.title("📊 Predictive Analytics & Recommendations")
 
 def load_data():
-    with Session(engine) as session:
-        # Load Recommendations
-        recs_query = select(Recommendation, Customer, Product).join(Customer).join(Product)
-        recs = session.exec(recs_query).all()
-        
-        rec_data = []
-        for r, c, p in recs:
-            rec_data.append({
-                "Customer ID": c.customer_id,
-                "Customer Email": c.email,
-                "Product": p.product_name,
-                "Window": r.recommended_contact_window,
-                "Confidence": r.confidence_level,
-                "Reasoning": r.reasoning,
-                "Date": r.generated_date
-            })
+    """Load recommendations from database, returns empty DataFrame if no data or error."""
+    try:
+        with Session(engine) as session:
+            # Load Recommendations
+            recs_query = select(Recommendation, Customer, Product).join(Customer).join(Product)
+            recs = session.exec(recs_query).all()
             
-        if not rec_data:
-            return pd.DataFrame(columns=[
-                "Customer ID", "Customer Email", "Product", 
-                "Window", "Confidence", "Reasoning", "Date"
-            ])
-            
-        return pd.DataFrame(rec_data)
+            rec_data = []
+            for r, c, p in recs:
+                rec_data.append({
+                    "Customer ID": c.customer_id,
+                    "Customer Email": c.email,
+                    "Product": p.product_name,
+                    "Window": r.recommended_contact_window,
+                    "Confidence": r.confidence_level,
+                    "Reasoning": r.reasoning,
+                    "Date": r.generated_date
+                })
+                
+            if not rec_data:
+                return pd.DataFrame(columns=[
+                    "Customer ID", "Customer Email", "Product", 
+                    "Window", "Confidence", "Reasoning", "Date"
+                ])
+                
+            return pd.DataFrame(rec_data)
+    except Exception as e:
+        # If there's any error (table doesn't exist, config issue, etc), return empty DataFrame
+        # This allows the app to load so user can click "Generate Mock Data"
+        return pd.DataFrame(columns=[
+            "Customer ID", "Customer Email", "Product", 
+            "Window", "Confidence", "Reasoning", "Date"
+        ])
 
 df_recs = load_data()
 
