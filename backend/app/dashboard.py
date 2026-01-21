@@ -39,6 +39,12 @@ def load_data():
                 "Date": r.generated_date
             })
             
+        if not rec_data:
+            return pd.DataFrame(columns=[
+                "Customer ID", "Customer Email", "Product", 
+                "Window", "Confidence", "Reasoning", "Date"
+            ])
+            
         return pd.DataFrame(rec_data)
 
 df_recs = load_data()
